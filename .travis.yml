@@ -44,7 +44,8 @@ script:
 after_success:
   - cd $TRAVIS_BUILD_DIR
   # if images changed, push new images to hub.docker.com
-  - if [ "$TRAVIS_BRANCH" == "main" ]; then
+  - |
+    if [ "$TRAVIS_BRANCH" == "main" ]; then
       docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
       if [ ! -z "`git diff --shortstat HEAD^ HEAD -- rust/`" ]; then 
         docker push redtankd/ubuntu-rust
