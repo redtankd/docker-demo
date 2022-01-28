@@ -1,0 +1,52 @@
+# Partner Queue Solution, which can be used completely for free.
+# https://docs.travis-ci.com/user/billing-overview/#partner-queue-solution
+os: linux
+
+arch:
+  - arm64
+
+services:
+  - docker
+
+# addons:
+#   apt:
+#     packages:
+
+# before_script:
+
+script:
+  - cd $TRAVIS_BUILD_DIR/base
+  # Path outside the build context is forbidden, so the context path is not the path of Dockerfile.
+  - docker build -t redtankd/ubuntu-base -f ubuntu/Dockerfile .
+  - docker run --rm redtankd/ubuntu-base fish --version
+  - docker run --rm redtankd/ubuntu-base git --version
+  - docker run --rm redtankd/ubuntu-base vim --version
+  - |
+    docker build -t redtankd/alpine-base -f alpine/Dockerfile \
+      --build-arg ALPINE_APT_SOURCE=$ALPINE_APT_SOURCE \
+      .
+  - docker run --rm redtankd/alpine-base fish --version
+  - docker run --rm redtankd/alpine-base git --version
+  - docker run --rm redtankd/alpine-base vim --version
+
+  - cd $TRAVIS_BUILD_DIR/rust
+  - |
+    docker build -t redtankd/ubuntu-rust -f ubuntu/Dockerfile \
+      --build-arg RUSTUP_UPDATE_ROOT=$RUSTUP_UPDATE_ROOT \
+      --build-arg RUSTUP_DIST_SERVER=$RUSTUP_DIST_SERVER \
+      --build-arg SOURCE_CRATES_IO=$SOURCE_CRATES_IO \
+      .
+  - docker run --rm redtankd/ubuntu-rust fish -c "rustup run stable cargo --version"
+  - docker run --rm redtankd/ubuntu-rust fish -c "rustup run nightly cargo --version"
+  - docker run --rm redtankd/ubuntu-rust fish -c "rustup run stable rustc --version"
+  - docker run --rm redtankd/ubuntu-rust fish -c "rustup run nightly rustc --version"
+
+after_success:
+  - cd $TRAVIS_BUILD_DIR
+  # if images changed, push new images to hub.docker.com
+  - if [ "$TRAVIS_BRANCH" == "main" ]; then
+      docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+      if [ ! -z "`git diff --shortstat HEAD^ HEAD -- rust/`" ]; then 
+        docker push redtankd/ubuntu-rust
+      fi
+    fi

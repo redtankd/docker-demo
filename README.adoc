@@ -1,0 +1,41 @@
+= A Demo for Docker
+
+== China's mirror for docker
+
+In `~/.docker/daemon.json`, adding the mirror registry
+
+```
+{
+  "debug" : true,
+  "experimental" : true,
+  "registry-mirrors" : [
+    "https://registry.docker-cn.com"
+  ]
+}
+```
+
+== Base Demo
+
+A simple developing environment.
+
+```shell
+cd base
+docker build -t redtankd/alpine-base -f alpine/Dockerfile .
+
+docker run -it --name base -h base redtankd/alpine-base fish
+
+docker start -i base
+```
+
+`ubuntu/Dockerfile` is for Ubuntu distribution. `alpine/Dockerfile` is for Alpine distribution.
+
+== Rust Demo
+
+```
+cd rust
+docker build -t redtankd/ubuntu-rust -f ubuntu/Dockerfile .
+
+docker run -it --name rust -h rust --security-opt seccomp=unconfined -v ~/dev/git:/root/dev/git redtankd/ubuntu-rust fish
+```
+
+Dockerfile for Alpine doesn't work now.

@@ -1,0 +1,44 @@
+[user]
+	name = 
+	email = 
+
+[core]
+	excludesfile = 
+	quotepath = false
+
+[alias]
+    a = add
+    b = branch
+    c = commit
+    co = checkout
+    d = diff
+    e = add --edit
+    f = fetch
+    g = grep
+    h = help
+    i = init
+    l = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+    ll = log --stat
+    m = merge
+    r = remote
+    s = status
+    t = tag
+    w = whatchanged
+
+[color]
+    ui = always
+    status = auto
+    branch = auto
+    interactive = auto
+    diff = auto
+
+[merge]
+    tool = vimdiff
+
+[push]
+    default = simple
+
+[filter "lfs"]
+	clean = git-lfs clean %f
+	smudge = git-lfs smudge %f
+	required = true
